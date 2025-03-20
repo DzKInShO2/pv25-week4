@@ -36,13 +36,15 @@ class MynApp(QWidget):
 
     def __init_components(self):
         self.setWindowTitle("POS Application")
-        self.setFixedSize(480, 360)
+        # self.setFixedSize(480, 480)
+        self.setGeometry(0, 0, 480, 360)
 
         root_layout = QVBoxLayout()
 
         form_layout = QFormLayout()
         form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         form_layout.setFormAlignment(Qt.AlignmentFlag.AlignHCenter)
+        form_layout.setSpacing(10)
 
         self.product_selection = QComboBox()
         self.product_selection.addItems(self.products.keys())
@@ -70,26 +72,31 @@ class MynApp(QWidget):
         self.total_number = 0
         self.total_label = QLabel(f"Total: Rp. {self.total_number}")
 
-        root_layout.addLayout(form_layout, 3)
-        root_layout.addWidget(self.item_list, 6)
+        root_layout.addLayout(form_layout, 5)
+        root_layout.addWidget(self.item_list, 4)
         root_layout.addWidget(self.total_label, 1)
+        root_layout.addWidget(QLabel("F1D02310110 - Dzakanov Inshoofi"))
 
         self.setLayout(root_layout)
 
     def __add_item_to_list(self):
         selected = self.product_selection.currentText()
-        quantity = int(self.product_quantity.text())
-        discount = self.discount_selection.currentText()
+        quantity = self.product_quantity.text()
+        if selected == "" or not quantity.isnumeric():
+            self.total_label.setText("Invalid input")
+        else:
+            quantity = int(quantity)
+            discount = self.discount_selection.currentText()
 
-        text = f"{selected} - {quantity} "
-        text += f"x Rp. {self.products[selected]:,} (disc {discount})"
-        self.item_list.addItem(text)
+            text = f"{selected} - {quantity} "
+            text += f"x Rp. {self.products[selected]:,} (disc {discount})"
+            self.item_list.addItem(text)
 
-        price = self.products[selected] * quantity
-        price -= price * self.discounts[discount]
+            price = self.products[selected] * quantity
+            price -= price * self.discounts[discount]
 
-        self.total_number += int(price)
-        self.total_label.setText(f"Total: Rp. {self.total_number:,}")
+            self.total_number += int(price)
+            self.total_label.setText(f"Total: Rp. {self.total_number:,}")
 
     def __clear_item_list(self):
         self.item_list.clear()
